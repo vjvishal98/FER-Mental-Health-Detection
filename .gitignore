@@ -1,0 +1,22 @@
+# Ignore macOS system files
+.DS_Store
+
+# Datasets and generated image samples
+/datasets/
+/FER2013_processed/
+/test_face.jpg
+
+# Model checkpoints
+*.pth
+*.pt
+
+# Local outputs and Python cache
+/smoke_outputs/
+__pycache__/
+*.py[cod]
+.touch_*
+/images/facial-expression-recognition-augmented-dataset.jpg
+/images/facial-emotion-recognition-grad-cam-visualizations.jpg
+
+# Local backup copies
+*.bak

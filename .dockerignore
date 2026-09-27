@@ -1,0 +1,15 @@
+__pycache__
+*.pyc
+venv/
+.venv/
+*.pth
+*.pth.tar
+smoke_outputs/
+*.pth
+*.ipynb
+*.log
+.env
+.DS_Store
+.git
+.gitignore
+*** End Patch
