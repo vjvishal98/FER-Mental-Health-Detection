@@ -246,6 +246,9 @@ video, or camera uploads and does not produce predictions. The repository does
 not include a verified model checkpoint, so the original dashboard must not be
 used to interpret untrained model outputs.
 
+Open the [hosted informational demo](https://fer-mental-health-detection-demo.streamlit.app/).
+Analysis and media uploads are disabled.
+
 To run the informational demo locally:
 
 ```bash

@@ -58,8 +58,8 @@ with st.sidebar:
         "not enabled, so this page does not collect or process face media."
     )
     st.write(
-        "The original repository dashboard runs model inference on its server. "
-        "Do not upload sensitive images to a hosted app."
+        "The separate dashboard processes inputs in the environment where you "
+        "run it. If hosted elsewhere, review that host's data handling before use."
     )
 
 st.markdown('<p class="eyebrow">Open-source computer vision project</p>', unsafe_allow_html=True)
@@ -131,6 +131,7 @@ with project:
     )
     st.markdown(
         "[View the source repository](https://github.com/vjvishal98/FER-Mental-Health-Detection) · "
+        "[View the project website](https://vjvishal98.github.io/FER-Mental-Health-Detection/) · "
         "[Read the setup guide](https://github.com/vjvishal98/FER-Mental-Health-Detection#quick-local-run-powershell)"
     )
 
