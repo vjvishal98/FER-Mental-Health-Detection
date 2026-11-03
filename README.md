@@ -238,6 +238,24 @@ make run
 make smoke
 ```
 
+## Hosted demo
+
+The informational Streamlit demo is in `streamlit_demo/app.py` and uses its
+own lightweight `requirements.txt`. It intentionally does not accept image,
+video, or camera uploads and does not produce predictions. The repository does
+not include a verified model checkpoint, so the original dashboard must not be
+used to interpret untrained model outputs.
+
+To run the informational demo locally:
+
+```bash
+pip install -r streamlit_demo/requirements.txt
+python -m streamlit run streamlit_demo/app.py
+```
+
+Facial expression recognition is not a diagnosis of mental-health conditions.
+Do not use this research project for clinical or other high-impact decisions.
+
 ## 🐳 Docker (optional)
 
 To run the app in a container (CPU-only image):
