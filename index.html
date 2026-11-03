@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10110f">
+  <meta name="description" content="An open-source facial expression recognition research project built with PyTorch, Swin Transformer, and Streamlit.">
+  <title>EmotiSense — Facial Expression Recognition</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #10110f;
+      --surface: #171916;
+      --line: #2a2d28;
+      --text: #f1f0e9;
+      --muted: #a4a79d;
+      --lime: #d3f36b;
+      --mint: #a9dec1;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(ellipse at 82% 14%, rgb(101 127 61 / 14%), transparent 34rem),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    a { color: inherit; }
+    a:focus-visible { outline: 2px solid var(--lime); outline-offset: 5px; }
+    .wrap { width: min(1120px, calc(100% - 48px)); margin-inline: auto; }
+    .topbar {
+      height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgb(255 255 255 / 8%);
+    }
+    .brand { display: flex; align-items: center; gap: 11px; text-decoration: none; font-weight: 650; letter-spacing: -.03em; }
+    .brand-mark {
+      width: 31px; height: 31px; display: grid; place-items: center;
+      border-radius: 10px; background: var(--lime); color: #14170e; font-size: 15px;
+    }
+    .nav { display: flex; gap: 29px; align-items: center; }
+    .nav a { color: var(--muted); font-size: 13px; text-decoration: none; }
+    .nav a:hover { color: var(--text); }
+    .nav .github-link { color: var(--text); border: 1px solid #3a3d36; border-radius: 999px; padding: 8px 14px; }
+    .hero {
+      min-height: 590px;
+      display: grid;
+      grid-template-columns: 1.08fr .92fr;
+      gap: 60px;
+      align-items: center;
+      padding-block: 74px 82px;
+    }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 9px;
+      color: var(--lime); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; font-weight: 700;
+    }
+    .eyebrow::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 16px #d3f36b88; }
+    h1 { max-width: 650px; margin: 23px 0 19px; font-size: clamp(42px, 6vw, 72px); line-height: 1.04; letter-spacing: -.065em; font-weight: 600; }
+    h1 span { color: var(--lime); }
+    .intro { max-width: 535px; color: var(--muted); font-size: 17px; line-height: 1.75; }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 31px; }
+    .button {
+      display: inline-flex; min-height: 46px; align-items: center; justify-content: center; gap: 10px;
+      padding: 0 18px; border: 1px solid transparent; border-radius: 7px;
+      font-size: 13px; font-weight: 650; text-decoration: none; transition: transform .18s ease, background .18s ease;
+    }
+    .button:hover { transform: translateY(-2px); }
+    .button.primary { background: var(--lime); color: #171a10; }
+    .button.secondary { border-color: #3a3d36; color: var(--text); }
+    .button.secondary:hover { background: #20231e; }
+    .arrow { font-size: 17px; line-height: 0; }
+    .demo-card {
+      position: relative; overflow: hidden; min-height: 365px; padding: 25px;
+      border: 1px solid #363a31; border-radius: 14px;
+      background: linear-gradient(145deg, #1d211a, #151713 70%);
+      box-shadow: 0 32px 90px rgb(0 0 0 / 28%);
+    }
+    .demo-card::after {
+      content: ""; position: absolute; width: 230px; height: 230px; top: -125px; right: -80px;
+      border-radius: 50%; background: #d3f36b; filter: blur(100px); opacity: .14;
+    }
+    .card-head { display: flex; justify-content: space-between; align-items: center; padding-bottom: 22px; border-bottom: 1px solid var(--line); }
+    .card-title { font-size: 13px; font-weight: 650; }
+    .status { color: var(--muted); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
+    .status::before { content: ""; display: inline-block; width: 6px; height: 6px; margin: 0 8px 1px 0; border-radius: 50%; background: var(--mint); }
+    .chart-label { margin: 23px 0 17px; color: var(--muted); font-size: 11px; }
+    .meter { display: grid; grid-template-columns: 72px 1fr 38px; gap: 11px; align-items: center; margin: 17px 0; font-size: 11px; }
+    .meter-label { color: #d0d1ca; }
+    .track { height: 5px; border-radius: 8px; background: #34372f; }
+    .fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, #9eb956, var(--lime)); }
+    .meter-value { color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
+    .card-note { margin-top: 28px; padding: 12px 13px; border: 1px solid #33372d; border-radius: 7px; color: #aaada3; font-size: 10px; line-height: 1.55; }
+    .section { padding-block: 77px; border-top: 1px solid rgb(255 255 255 / 8%); }
+    .section-heading { max-width: 620px; margin-bottom: 31px; }
+    .section-heading h2 { margin: 11px 0; font-size: clamp(28px, 4vw, 40px); line-height: 1.15; letter-spacing: -.045em; font-weight: 550; }
+    .section-heading p { color: var(--muted); font-size: 14px; }
+    .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .feature {
+      min-height: 185px; padding: 21px; border: 1px solid var(--line); border-radius: 9px; background: rgb(23 25 22 / 78%);
+    }
+    .feature-icon { color: var(--lime); font-size: 18px; }
+    .feature h3 { margin: 19px 0 7px; font-size: 14px; font-weight: 650; }
+    .feature p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.7; }
+    .run-panel {
+      display: grid; grid-template-columns: .8fr 1.2fr; gap: 40px; align-items: center;
+      padding: 28px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface);
+    }
+    .run-panel h3 { margin: 0 0 9px; font-size: 21px; letter-spacing: -.03em; }
+    .run-panel p { margin: 0; color: var(--muted); font-size: 12px; }
+    pre { overflow-x: auto; margin: 0; padding: 17px; border: 1px solid #30332d; border-radius: 7px; background: #10120f; color: #d6eda0; font: 12px/1.8 ui-monospace, SFMono-Regular, Consolas, monospace; }
+    .notice { margin-top: 15px; padding-left: 13px; border-left: 2px solid #8e9b64; color: var(--muted); font-size: 11px; }
+    footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; padding-block: 24px; border-top: 1px solid rgb(255 255 255 / 8%); color: var(--muted); font-size: 11px; }
+    footer a { color: var(--text); text-decoration: none; }
+    @media (max-width: 760px) {
+      .wrap { width: min(100% - 32px, 560px); }
+      .topbar { height: 66px; }
+      .nav { gap: 15px; }
+      .nav a:not(.github-link) { display: none; }
+      .hero { min-height: auto; grid-template-columns: 1fr; gap: 38px; padding-block: 66px 56px; }
+      .intro { font-size: 15px; }
+      .demo-card { min-height: 340px; }
+      .section { padding-block: 57px; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .feature { min-height: auto; }
+      .run-panel { grid-template-columns: 1fr; gap: 22px; padding: 20px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="wrap topbar">
+    <a class="brand" href="#" aria-label="EmotiSense home">
+      <span class="brand-mark" aria-hidden="true">e</span>
+      <span>EmotiSense <span style="color:#85897e;font-weight:450">/ research</span></span>
+    </a>
+    <nav class="nav" aria-label="Main navigation">
+      <a href="#project">Project</a>
+      <a href="#features">What it does</a>
+      <a href="#run">Run locally</a>
+      <a class="github-link" href="https://github.com/vjvishal98/FER-Mental-Health-Detection">View on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="wrap hero" id="project">
+      <div>
+        <div class="eyebrow">Open-source computer vision project</div>
+        <h1>Reading expressions.<br><span>Exploring emotion.</span></h1>
+        <p class="intro">A facial expression recognition research prototype built with PyTorch and a Swin Transformer, with a Streamlit dashboard for exploring image, video, and camera inputs.</p>
+        <div class="actions">
+          <a class="button primary" href="https://github.com/vjvishal98/FER-Mental-Health-Detection">Explore the repository <span class="arrow" aria-hidden="true">↗</span></a>
+          <a class="button secondary" href="https://github.com/vjvishal98/FER-Mental-Health-Detection#-emotion-detection-using-python-installation">Get started <span class="arrow" aria-hidden="true">↓</span></a>
+        </div>
+      </div>
+
+      <aside class="demo-card" aria-label="Illustrative emotion classification chart">
+        <div class="card-head">
+          <span class="card-title">Expression overview</span>
+          <span class="status">Illustrative</span>
+        </div>
+        <p class="chart-label">Example class probabilities · visual only</p>
+        <div class="meter"><span class="meter-label">Neutral</span><span class="track"><span class="fill" style="display:block;width:72%"></span></span><span class="meter-value">0.72</span></div>
+        <div class="meter"><span class="meter-label">Happy</span><span class="track"><span class="fill" style="display:block;width:48%;opacity:.78"></span></span><span class="meter-value">0.48</span></div>
+        <div class="meter"><span class="meter-label">Surprise</span><span class="track"><span class="fill" style="display:block;width:31%;opacity:.66"></span></span><span class="meter-value">0.31</span></div>
+        <div class="meter"><span class="meter-label">Sad</span><span class="track"><span class="fill" style="display:block;width:19%;opacity:.54"></span></span><span class="meter-value">0.19</span></div>
+        <div class="card-note">Illustrative interface graphic only — not generated by a model or based on a real person.</div>
+      </aside>
+    </section>
+
+    <section class="section" id="features">
+      <div class="wrap">
+        <div class="section-heading">
+          <div class="eyebrow">Inside the project</div>
+          <h2>From visual input to model output.</h2>
+          <p>Explore a compact computer-vision workflow, from image preprocessing to an interactive results dashboard.</p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature">
+            <span class="feature-icon" aria-hidden="true">◈</span>
+            <h3>Swin Transformer</h3>
+            <p>A PyTorch image-classification model configured for seven expression classes.</p>
+          </article>
+          <article class="feature">
+            <span class="feature-icon" aria-hidden="true">▧</span>
+            <h3>Interactive dashboard</h3>
+            <p>A Streamlit interface for trying image uploads, short videos, and camera input.</p>
+          </article>
+          <article class="feature">
+            <span class="feature-icon" aria-hidden="true">⌁</span>
+            <h3>Results &amp; reports</h3>
+            <p>View class probabilities and export example analysis reports from the dashboard.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="run">
+      <div class="wrap">
+        <div class="run-panel">
+          <div>
+            <div class="eyebrow">Try it on your machine</div>
+            <h3>Run the dashboard locally.</h3>
+            <p>Clone the repository, install its dependencies, then start Streamlit.</p>
+          </div>
+          <div>
+            <pre><code>git clone https://github.com/vjvishal98/FER-Mental-Health-Detection.git
+cd FER-Mental-Health-Detection
+pip install -r requirements.txt
+python -m streamlit run dashboard.py --server.port 8502</code></pre>
+            <p class="notice">The model checkpoint is not included in the repository. Without valid weights, predictions are not meaningful. This research demo is not a medical or mental-health diagnostic tool.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wrap">
+    <span>EmotiSense · Open-source research prototype</span>
+    <a href="https://github.com/vjvishal98/FER-Mental-Health-Detection">Source code on GitHub ↗</a>
+  </footer>
+</body>
+</html>
